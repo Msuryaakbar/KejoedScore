@@ -1,5 +1,4 @@
 <?php
-// app/Models/Nilai.php - UPDATE
 
 namespace App\Models;
 
@@ -13,6 +12,7 @@ class Nilai extends Model
     protected $table = 'nilai';
     protected $fillable = [
         'siswa_id',
+        'guru_id',
         'mata_pelajaran_id',
         'tahun_ajaran_id',
         'catatan',
@@ -23,12 +23,15 @@ class Nilai extends Model
         'hadir',
         'izin',
         'sakit',
-        'alfa'
+        'alfa',
+        'nilai_dongkrak',
+        'catatan_dongkrak',
     ];
 
     protected $casts = [
         'catatan' => 'array',
         'nilai_komponen' => 'array',
+        'nilai_dongkrak' => 'decimal:2',
     ];
 
     // Relasi
@@ -45,6 +48,11 @@ class Nilai extends Model
     public function tahunAjaran()
     {
         return $this->belongsTo(TahunAjaran::class);
+    }
+
+    public function guru()
+    {
+        return $this->belongsTo(User::class, 'guru_id');
     }
 
     // Accessor
@@ -78,5 +86,11 @@ class Nilai extends Model
 
         // Nilai akhir tidak boleh lebih dari 100 atau kurang dari 0
         return max(0, min(100, $totalNilai - $penguranganAlfa));
+    }
+
+    // Accessor untuk nilai yang akan ditampilkan (dongkrak jika ada, atau asli)
+    public function getNilaiDisplayAttribute()
+    {
+        return $this->nilai_dongkrak ?? $this->nilai_akhir;
     }
 }

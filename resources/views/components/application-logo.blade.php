@@ -1,0 +1,1 @@
+<img src="{{ asset('images/smp.png') }}" {{ $attributes->merge(['alt' => 'KejoedScore Logo']) }} />

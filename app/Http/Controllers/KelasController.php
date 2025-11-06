@@ -12,7 +12,11 @@ class KelasController extends Controller
      */
     public function index()
     {
-        $kelas = Kelas::withCount('siswa')->orderBy('tingkat')->orderBy('nama_kelas')->get();
+        $kelas = Kelas::withCount('siswa')
+            ->orderBy('tingkat')
+            ->orderBy('nama_kelas')
+            ->paginate(10); // 10 item per halaman
+
         return view('kelas.index', compact('kelas'));
     }
 

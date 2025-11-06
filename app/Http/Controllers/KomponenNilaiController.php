@@ -9,15 +9,15 @@ use Illuminate\Http\Request;
 
 class KomponenNilaiController extends Controller
 {
-    public function index($mapelId)
+    public function index($mapelId) // Ubah parameter menjadi $mapelId
     {
         $mapel = MataPelajaran::findOrFail($mapelId);
-        $komponen = KomponenNilai::where('mata_pelajaran_id', $mapelId)->orderBy('urutan')->get();
+        $komponen = KomponenNilai::where('mata_pelajaran_id', $mapel->id)->orderBy('urutan')->get();
 
         return view('komponen-nilai.index', compact('mapel', 'komponen'));
     }
 
-    public function store(Request $request, $mapelId)
+    public function store(Request $request, $mapelId) // Ubah parameter menjadi $mapelId
     {
         $request->validate([
             'nama_komponen' => 'required|string|max:255',
@@ -33,10 +33,11 @@ class KomponenNilaiController extends Controller
             'urutan' => $urutan,
         ]);
 
-        return redirect()->route('komponen-nilai.index', $mapelId)->with('success', 'Komponen nilai berhasil ditambahkan');
+        return redirect()->route('komponen-nilai.index', ['mapelId' => $mapelId]) // Sesuaikan parameter
+            ->with('success', 'Komponen nilai berhasil ditambahkan');
     }
 
-    public function update(Request $request, $mapelId, $id)
+    public function update(Request $request, $mapelId, $id) // Ubah parameter menjadi $mapelId
     {
         $request->validate([
             'nama_komponen' => 'required|string|max:255',
@@ -46,14 +47,16 @@ class KomponenNilaiController extends Controller
         $komponen = KomponenNilai::findOrFail($id);
         $komponen->update($request->only(['nama_komponen', 'bobot']));
 
-        return redirect()->route('komponen-nilai.index', $mapelId)->with('success', 'Komponen nilai berhasil diperbarui');
+        return redirect()->route('komponen-nilai.index', ['mapelId' => $mapelId]) // Sesuaikan parameter
+            ->with('success', 'Komponen nilai berhasil diperbarui');
     }
 
-    public function destroy($mapelId, $id)
+    public function destroy($mapelId, $id) // Ubah parameter menjadi $mapelId
     {
         $komponen = KomponenNilai::findOrFail($id);
         $komponen->delete();
 
-        return redirect()->route('komponen-nilai.index', $mapelId)->with('success', 'Komponen nilai berhasil dihapus');
+        return redirect()->route('komponen-nilai.index', ['mapelId' => $mapelId]) // Sesuaikan parameter
+            ->with('success', 'Komponen nilai berhasil dihapus');
     }
 }

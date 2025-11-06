@@ -8,6 +8,7 @@ use App\Models\Nilai;
 use App\Models\MataPelajaran;
 use App\Models\TahunAjaran;
 use App\Models\KomponenNilai;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class NilaiController extends Controller
@@ -15,7 +16,18 @@ class NilaiController extends Controller
     // Step 1: Pilih Mata Pelajaran
     public function index()
     {
-        $mataPelajaran = MataPelajaran::all();
+        $user = auth()->user();
+        /** @var User $user */
+        // Orang Tua tidak boleh akses input nilai
+        if (! $user) {
+            abort(403, 'Akses ditolak. Silakan login.');
+        }
+
+        if ($user->isOrtu()) {
+            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+        }
+
+        $mapel = MataPelajaran::with('komponenNilai')->get(); // Ubah menjadi $mapel
         $tahunAjaranAktif = TahunAjaran::where('is_active', true)->first();
 
         if (!$tahunAjaranAktif) {
@@ -23,12 +35,18 @@ class NilaiController extends Controller
                 ->with('error', 'Belum ada tahun ajaran aktif. Silakan set tahun ajaran aktif terlebih dahulu.');
         }
 
-        return view('nilai.pilih-mapel', compact('mataPelajaran', 'tahunAjaranAktif'));
+        return view('nilai.pilih-mapel', compact('mapel', 'tahunAjaranAktif')); // Ubah menjadi $mapel
     }
-
     // Step 2: Pilih Kelas
     public function pilihKelas($mapelId)
     {
+        $user = auth()->user();
+        /** @var User $user */
+        // Orang Tua tidak boleh akses
+        if ($user->isOrtu()) {
+            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+        }
+
         $mapel = MataPelajaran::with('komponenNilai')->findOrFail($mapelId);
         $kelas = Kelas::withCount('siswa')->get();
         $tahunAjaranAktif = TahunAjaran::where('is_active', true)->first();
@@ -46,6 +64,13 @@ class NilaiController extends Controller
     // Step 3: Input Nilai (Batch)
     public function show($mapelId, $kelasId)
     {
+        $user = auth()->user();
+        /** @var User $user */
+        // Orang Tua tidak boleh akses
+        if ($user->isOrtu()) {
+            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+        }
+
         $mapel = MataPelajaran::with('komponenNilai')->findOrFail($mapelId);
         $kelas = Kelas::findOrFail($kelasId);
         $tahunAjaranAktif = TahunAjaran::where('is_active', true)->first();
@@ -73,6 +98,13 @@ class NilaiController extends Controller
     // Save Batch Input
     public function batchUpdate(Request $request, $mapelId, $kelasId)
     {
+        $user = auth()->user();
+        /** @var User $user */
+        // Orang Tua tidak boleh akses
+        if ($user->isOrtu()) {
+            abort(403, 'Anda tidak memiliki akses untuk melakukan ini.');
+        }
+
         $request->validate([
             'siswa' => 'required|array',
             'siswa.*.catatan' => 'nullable|array',
@@ -84,6 +116,7 @@ class NilaiController extends Controller
         ]);
 
         $tahunAjaranAktif = TahunAjaran::where('is_active', true)->first();
+        $guruId = auth()->id(); // Simpan ID guru yang input
 
         foreach ($request->siswa as $siswaId => $data) {
             Nilai::updateOrCreate(
@@ -93,6 +126,7 @@ class NilaiController extends Controller
                     'tahun_ajaran_id' => $tahunAjaranAktif->id,
                 ],
                 [
+                    'guru_id' => $guruId, // Simpan guru yang input
                     'catatan' => $data['catatan'] ?? [],
                     'nilai_komponen' => $data['nilai_komponen'],
                     'hadir' => $data['hadir'],
@@ -110,6 +144,13 @@ class NilaiController extends Controller
     // === REKAP ===
     public function rekapIndex()
     {
+        $user = auth()->user();
+        /** @var User $user */
+        // Orang Tua tidak boleh akses rekap
+        if ($user->isOrtu()) {
+            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+        }
+
         $mataPelajaran = MataPelajaran::all();
         $tahunAjaranAktif = TahunAjaran::where('is_active', true)->first();
 
@@ -118,6 +159,13 @@ class NilaiController extends Controller
 
     public function rekapPilihKelas($mapelId)
     {
+        $user = auth()->user();
+        /** @var User $user */
+        // Orang Tua tidak boleh akses
+        if ($user->isOrtu()) {
+            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+        }
+
         $mapel = MataPelajaran::findOrFail($mapelId);
         $kelas = Kelas::withCount('siswa')->get();
         $tahunAjaranAktif = TahunAjaran::where('is_active', true)->first();
@@ -127,6 +175,13 @@ class NilaiController extends Controller
 
     public function rekapShow($mapelId, $kelasId)
     {
+        $user = auth()->user();
+        /** @var User $user */
+        // Orang Tua tidak boleh akses
+        if ($user->isOrtu()) {
+            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+        }
+
         $mapel = MataPelajaran::with('komponenNilai')->findOrFail($mapelId);
         $kelas = Kelas::findOrFail($kelasId);
         $tahunAjaranAktif = TahunAjaran::where('is_active', true)->first();

@@ -18,12 +18,33 @@
             font-size: 11pt;
             line-height: 1.4;
             color: #000;
+            position: relative;
         }
+
+        /* Watermark Logo */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            height: 500px;
+            background-image: url('{{ asset('images/smp.png') }}');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.05;
+            z-index: -1;
+        }
+
         .container {
             width: 100%;
             max-width: 210mm;
             margin: 0 auto;
             padding: 10mm;
+            position: relative;
+            z-index: 1;
         }
         
         /* Header */
@@ -166,6 +187,10 @@
             .no-print { display: none !important; }
             body { padding: 0; }
             .container { padding: 0; }
+            body::before {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
         }
         
         /* Predikat Colors */
@@ -344,50 +369,53 @@
                     <td></td>
                     <td></td>
                 </tr>
+                <tr>
+                    <td style="height: 30px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
             </tbody>
         </table>
 
         <!-- Kehadiran -->
-      <!-- Kehadiran -->
-@php
-    // Jika $nilaiPerMapel adalah array, ambil data pertama
-    $nilaiKehadiran = !empty($nilaiPerMapel) ? $nilaiPerMapel[array_key_first($nilaiPerMapel)]['nilai'] : null;
-@endphp
+        @php
+            $nilaiKehadiran = !empty($nilaiPerMapel) ? $nilaiPerMapel[array_key_first($nilaiPerMapel)]['nilai'] : null;
+        @endphp
 
-<table class="attendance-table">
-    <tr>
-        <td class="label">Hadir</td>
-        <td class="separator">:</td>
-        <td class="value">{{ $nilaiKehadiran->hadir ?? 0 }} hari</td>
-    </tr>
-    <tr>
-        <td class="label">Izin</td>
-        <td class="separator">:</td>
-        <td class="value">{{ $nilaiKehadiran->izin ?? 0 }} hari</td>
-    </tr>
-    <tr>
-        <td class="label">Sakit</td>
-        <td class="separator">:</td>
-        <td class="value">{{ $nilaiKehadiran->sakit ?? 0 }} hari</td>
-    </tr>
-    <tr>
-        <td class="label">Tanpa Keterangan</td>
-        <td class="separator">:</td>
-        <td class="value">{{ $nilaiKehadiran->alfa ?? 0 }} hari</td>
-    </tr>
-</table>
-
+        <table class="attendance-table">
+            <tr>
+                <td class="label">Hadir</td>
+                <td class="separator">:</td>
+                <td class="value">{{ $nilaiKehadiran->hadir ?? 0 }} hari</td>
+            </tr>
+            <tr>
+                <td class="label">Izin</td>
+                <td class="separator">:</td>
+                <td class="value">{{ $nilaiKehadiran->izin ?? 0 }} hari</td>
+            </tr>
+            <tr>
+                <td class="label">Sakit</td>
+                <td class="separator">:</td>
+                <td class="value">{{ $nilaiKehadiran->sakit ?? 0 }} hari</td>
+            </tr>
+            <tr>
+                <td class="label">Tanpa Keterangan</td>
+                <td class="separator">:</td>
+                <td class="value">{{ $nilaiKehadiran->alfa ?? 0 }} hari</td>
+            </tr>
+        </table>
 
         <!-- Catatan Wali Kelas -->
         <div style="margin-bottom: 5px; font-weight: bold;">Catatan Wali Kelas</div>
         <div class="notes-box">
-            @if($rataRata >= 85)
+            {{-- @if($rataRata >= 85)
             Alhamdulillah, prestasi yang sangat baik. Pertahankan dan tingkatkan terus semangat belajarmu!
             @elseif($rataRata >= 75)
             Prestasi yang baik, tingkatkan lagi usaha dan semangat belajarmu untuk mencapai hasil yang lebih maksimal.
             @else
             Tingkatkan lagi usaha dan semangat belajarmu. Jangan ragu untuk bertanya kepada guru jika ada kesulitan.
-            @endif
+            @endif --}}
         </div>
 
         <!-- Signature Area -->
@@ -396,21 +424,21 @@
                 <div class="title">Mengetahui,</div>
                 <div class="title">Orang Tua/Wali,</div>
                 <div class="date">&nbsp;</div>
-                <div class="name">(__________________)</div>
+                <div class="name">__________________</div>
             </div>
             <div class="signature-box">
                 <div class="title">Lubuk Pakam, _______________</div>
                 <div class="title">Wali Kelas,</div>
                 <div class="date">&nbsp;</div>
-                <div class="name">(__________________)</div>
-                <div class="nip">NIP. ___________________</div>
+                <div class="name">__________________</div>
+                <div class="nip">NBM. ___________________</div>
             </div>
             <div class="signature-box">
                 <div class="title">Mengetahui,</div>
                 <div class="title">Kepala Sekolah,</div>
                 <div class="date">&nbsp;</div>
-                <div class="name">(__________________)</div>
-                <div class="nip">NIP. ___________________</div>
+                <div class="name">Ujang Suhandi, S.Pd.</div>
+                <div class="nip">NBM. ___________________</div>
             </div>
         </div>
 

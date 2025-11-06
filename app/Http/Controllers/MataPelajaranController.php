@@ -10,7 +10,10 @@ class MataPelajaranController extends Controller
 {
     public function index()
     {
-        $mataPelajaran = MataPelajaran::withCount('komponenNilai')->get();
+        $mataPelajaran = MataPelajaran::withCount('komponenNilai') // Ganti ke camelCase
+            ->orderBy('nama_mapel')
+            ->paginate(9);
+
         return view('mata-pelajaran.index', compact('mataPelajaran'));
     }
 
